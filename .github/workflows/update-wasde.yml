@@ -1,0 +1,74 @@
+name: Update WASDE Dashboard
+
+on:
+  # Auto-run on the 11th and 12th of each month (day after typical release)
+  schedule:
+    - cron: '0 18 11,12 * *'  # 6 PM UTC = 12 PM CST
+  # Manual trigger
+  workflow_dispatch:
+    inputs:
+      year:
+        description: 'Year (e.g. 2026)'
+        required: false
+      month:
+        description: 'Month (1-12)'
+        required: false
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install xlrd
+
+      - name: Update WASDE data
+        run: |
+          ARGS=""
+          if [ -n "${{ github.event.inputs.year }}" ]; then
+            ARGS="$ARGS --year ${{ github.event.inputs.year }}"
+          fi
+          if [ -n "${{ github.event.inputs.month }}" ]; then
+            ARGS="$ARGS --month ${{ github.event.inputs.month }}"
+          fi
+          python update_wasde.py $ARGS
+
+      - name: Commit and push
+        run: |
+          git config user.name "WASDE Bot"
+          git config user.email "wasde-bot@innovativegrain.ai"
+          git add index.html
+          git diff --cached --quiet || (git commit -m "Update WASDE dashboard - $(date +%Y-%m)" && git push)
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
+        with:
+          artifact_name: github-pages
+
+  deploy:
+    needs: update
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+      - id: deployment
+        uses: actions/deploy-pages@v4
