@@ -121,10 +121,13 @@ def extract_data(xls_path, year, month):
     oil_start = find_section(soy_rows, 'SOYBEAN OIL')
     meal_start = find_section(soy_rows, 'SOYBEAN MEAL')
     
+    # FIX: Case-insensitive label matching for soy rows
     def get_soy_row(label, start=soy_start, end=None):
         e = end or oil_start or len(soy_rows)
+        label_lower = label.lower()
         for i in range(start, e):
-            if str(soy_rows[i][0]).strip().startswith(label):
+            cell = str(soy_rows[i][0]).strip()
+            if cell.lower().startswith(label_lower):
                 return [safe(soy_rows[i][j]) for j in range(1, 5)]
         return [0, 0, 0, 0]
 
@@ -149,7 +152,7 @@ def extract_data(xls_path, year, month):
             'domesticUse': get_soy_row('Domestic Disappearance', oil_start, meal_start),
             'biofuel': get_soy_row('Biofuel', oil_start, meal_start),
             'exports': get_soy_row('Exports', oil_start, meal_start),
-            'endStocks': get_soy_row('Ending stocks', oil_start, meal_start),
+            'endStocks': get_soy_row('Ending Stocks', oil_start, meal_start),
         },
         'meal': {
             'price': get_soy_row('Avg. Price', meal_start),
@@ -159,6 +162,17 @@ def extract_data(xls_path, year, month):
             'endStocks': get_soy_row('Ending Stocks', meal_start),
         }
     }
+
+    # --- Debug: Print what we found in soybean meal section ---
+    print(f"\n  DEBUG — Soybean meal section starts at row {meal_start}")
+    if meal_start > 0:
+        for i in range(meal_start, min(meal_start + 20, len(soy_rows))):
+            cell = str(soy_rows[i][0]).strip()
+            if cell:
+                vals = [soy_rows[i][j] if j < len(soy_rows[i]) else '' for j in range(min(5, len(soy_rows[i])))]
+                print(f"    Row {i}: {cell[:50]:50s} | {vals[1:] if len(vals) > 1 else '(no data)'}")
+    else:
+        print("    WARNING: Could not find SOYBEAN MEAL section header!")
 
     # --- WHEAT (Page 11) ---
     wheat_rows = read_sheet('Page 11')
@@ -194,11 +208,16 @@ def extract_data(xls_path, year, month):
     }
 
     # Wheat by class (bottom of page 11)
-    wbc_start = find_section(wheat_rows, 'U.S. Wheat by Class')
+    wbc_start = 0
+    for i, row in enumerate(wheat_rows):
+        if 'Wheat by Class' in str(row[0]) or 'by Class' in str(row[0]):
+            wbc_start = i
+            break
+
     # Find the 2025/26 proj row
     proj_row_start = 0
     for i in range(wbc_start, len(wheat_rows)):
-        if '2025/26' in str(wheat_rows[i][0]) or '2025/26' in str(wheat_rows[i][0]):
+        if '2025/26' in str(wheat_rows[i][0]):
             proj_row_start = i
             break
 
@@ -211,7 +230,9 @@ def extract_data(xls_path, year, month):
                         safe(wheat_rows[i][10])]
         return [0, 0, 0, 0, 0]
 
-    wheat['byClass'] = {
+    # FIX: Store wheat by class data separately BEFORE process_dict runs
+    # so it doesn't get mangled by to3()
+    wheat_by_class = {
         'labels': ["HRW", "HRS", "SRW", "White", "Durum"],
         'production': get_wbc_row('Production'),
         'exports': get_wbc_row('Exports'),
@@ -234,7 +255,9 @@ def extract_data(xls_path, year, month):
         for k, v in d.items():
             if isinstance(v, dict):
                 result[k] = process_dict(v)
-            elif isinstance(v, list) and len(v) >= 4 and all(isinstance(x, (int, float)) for x in v):
+            elif isinstance(v, list) and len(v) == 4 and all(isinstance(x, (int, float)) for x in v):
+                # FIX: Only convert 4-element numeric lists (time-series format)
+                # Skip 5-element lists (wheat by class) and non-numeric lists
                 result[k] = to3(v)
             else:
                 result[k] = v
@@ -259,6 +282,10 @@ def extract_data(xls_path, year, month):
         'soybeans': process_dict(soybeans),
         'wheat': process_dict(wheat),
     }
+
+    # FIX: Assign wheat by class AFTER process_dict so the 5-element arrays stay intact
+    result['wheat']['byClass'] = wheat_by_class
+
     result['corn']['endStocksPrev'] = corn_es_prev
     result['soybeans']['endStocksPrev'] = soy_es_prev
     result['wheat']['endStocksPrev'] = wheat_es_prev
@@ -301,6 +328,16 @@ def main():
     print(f"Corn price: ${data['corn']['price'][2]}/bu  Ending stocks: {data['corn']['endStocks'][2]} mil bu")
     print(f"Soy price:  ${data['soybeans']['price'][2]}/bu  Ending stocks: {data['soybeans']['endStocks'][2]} mil bu")
     print(f"Wheat price: ${data['wheat']['price'][2]}/bu  Ending stocks: {data['wheat']['endStocks'][2]} mil bu")
+    
+    # Print soybean meal values to verify fix
+    meal = data['soybeans']['meal']
+    print(f"\nSoy meal — Production: {meal['production']}  Price: {meal['price']}  Exports: {meal['exports']}")
+    if all(v == 0 for sublist in [meal['production'], meal['price'], meal['exports']] for v in sublist):
+        print("  ⚠️  Soybean meal still showing zeros — check label matching against USDA spreadsheet")
+    
+    # Print wheat by class to verify fix
+    wbc = data['wheat']['byClass']
+    print(f"Wheat by class production: {wbc['production']} (should have 5 values)")
     
     print("\nUpdating HTML...")
     if update_html(data):
