@@ -76,7 +76,6 @@ def extract_data(xls_path, year, month):
 
     # --- CORN (Page 12) ---
     corn_rows = read_sheet('Page 12')
-    # Find the CORN section (starts after feed grains)
     corn_start = 0
     for i, row in enumerate(corn_rows):
         if str(row[0]).strip().startswith('CORN'):
@@ -89,7 +88,6 @@ def extract_data(xls_path, year, month):
                 return [safe(corn_rows[i][j]) for j in range(1, 5)]
         return [0, 0, 0, 0]
 
-    # Columns: [0]=label, [1]=2023/24, [2]=2024/25 Est., [3]=prev month proj, [4]=cur month proj
     corn = {
         'price': get_corn_row('Avg. Farm Price'),
         'planted': get_corn_row('Area Planted'),
@@ -110,6 +108,7 @@ def extract_data(xls_path, year, month):
 
     # --- SOYBEANS (Page 15) ---
     soy_rows = read_sheet('Page 15')
+    total_soy_rows = len(soy_rows)
     
     def find_section(rows, label):
         for i, row in enumerate(rows):
@@ -121,31 +120,33 @@ def extract_data(xls_path, year, month):
     oil_start = find_section(soy_rows, 'SOYBEAN OIL')
     meal_start = find_section(soy_rows, 'SOYBEAN MEAL')
     
-    # FIX: Case-insensitive label matching for soy rows
-    def get_soy_row(label, start=soy_start, end=None):
-        e = end or oil_start or len(soy_rows)
+    print(f"  Soy sections — beans: row {soy_start}, oil: row {oil_start}, meal: row {meal_start}, total rows: {total_soy_rows}")
+
+    # FIX: Use explicit end parameter; never default to a section that comes BEFORE start
+    def get_soy_row(label, start, end):
+        """Search for label between start and end rows (case-insensitive startswith)."""
         label_lower = label.lower()
-        for i in range(start, e):
+        for i in range(start, end):
             cell = str(soy_rows[i][0]).strip()
             if cell.lower().startswith(label_lower):
                 return [safe(soy_rows[i][j]) for j in range(1, 5)]
         return [0, 0, 0, 0]
 
     soybeans = {
-        'price': get_soy_row('Avg. Farm Price'),
-        'planted': get_soy_row('Area Planted'),
-        'harvested': get_soy_row('Area Harvested'),
-        'yield': get_soy_row('Yield per'),
-        'begStocks': get_soy_row('Beginning Stocks'),
-        'production': get_soy_row('Production'),
-        'imports': get_soy_row('Imports'),
-        'supplyTotal': get_soy_row('Supply, Total'),
-        'crushings': get_soy_row('Crushings'),
-        'exports': get_soy_row('Exports'),
-        'seed': get_soy_row('Seed'),
-        'residual': get_soy_row('Residual'),
-        'useTotal': get_soy_row('Use, Total'),
-        'endStocks': get_soy_row('Ending Stocks'),
+        'price': get_soy_row('Avg. Farm Price', soy_start, oil_start),
+        'planted': get_soy_row('Area Planted', soy_start, oil_start),
+        'harvested': get_soy_row('Area Harvested', soy_start, oil_start),
+        'yield': get_soy_row('Yield per', soy_start, oil_start),
+        'begStocks': get_soy_row('Beginning Stocks', soy_start, oil_start),
+        'production': get_soy_row('Production', soy_start, oil_start),
+        'imports': get_soy_row('Imports', soy_start, oil_start),
+        'supplyTotal': get_soy_row('Supply, Total', soy_start, oil_start),
+        'crushings': get_soy_row('Crushings', soy_start, oil_start),
+        'exports': get_soy_row('Exports', soy_start, oil_start),
+        'seed': get_soy_row('Seed', soy_start, oil_start),
+        'residual': get_soy_row('Residual', soy_start, oil_start),
+        'useTotal': get_soy_row('Use, Total', soy_start, oil_start),
+        'endStocks': get_soy_row('Ending Stocks', soy_start, oil_start),
         'oil': {
             'price': get_soy_row('Avg. Price', oil_start, meal_start),
             'production': get_soy_row('Production', oil_start, meal_start),
@@ -154,36 +155,23 @@ def extract_data(xls_path, year, month):
             'exports': get_soy_row('Exports', oil_start, meal_start),
             'endStocks': get_soy_row('Ending Stocks', oil_start, meal_start),
         },
+        # FIX: meal section searches from meal_start to END OF SHEET
         'meal': {
-            'price': get_soy_row('Avg. Price', meal_start),
-            'production': get_soy_row('Production', meal_start),
-            'domesticUse': get_soy_row('Domestic Disappearance', meal_start),
-            'exports': get_soy_row('Exports', meal_start),
-            'endStocks': get_soy_row('Ending Stocks', meal_start),
+            'price': get_soy_row('Avg. Price', meal_start, total_soy_rows),
+            'production': get_soy_row('Production', meal_start, total_soy_rows),
+            'domesticUse': get_soy_row('Domestic Disappearance', meal_start, total_soy_rows),
+            'exports': get_soy_row('Exports', meal_start, total_soy_rows),
+            'endStocks': get_soy_row('Ending Stocks', meal_start, total_soy_rows),
         }
     }
-
-    # --- Debug: Print what we found in soybean meal section ---
-    print(f"\n  DEBUG — Soybean meal section starts at row {meal_start}")
-    if meal_start > 0:
-        for i in range(meal_start, min(meal_start + 20, len(soy_rows))):
-            cell = str(soy_rows[i][0]).strip()
-            if cell:
-                vals = [soy_rows[i][j] if j < len(soy_rows[i]) else '' for j in range(min(5, len(soy_rows[i])))]
-                print(f"    Row {i}: {cell[:50]:50s} | {vals[1:] if len(vals) > 1 else '(no data)'}")
-    else:
-        print("    WARNING: Could not find SOYBEAN MEAL section header!")
 
     # --- WHEAT (Page 11) ---
     wheat_rows = read_sheet('Page 11')
     
-    # Top section uses different column layout (more cols with empties)
-    # Find the column indices by looking at header row
     def get_wheat_row(label, start=0, end=30):
         for i in range(start, min(end, len(wheat_rows))):
             cell = str(wheat_rows[i][0]).strip()
             if cell.startswith(label):
-                # Wheat top section has cols: 0=label, 4=23/24, 6=24/25, 9=prev, 11=cur
                 vals = [safe(wheat_rows[i][4]), safe(wheat_rows[i][6]),
                         safe(wheat_rows[i][9]), safe(wheat_rows[i][11])]
                 return vals
@@ -214,7 +202,6 @@ def extract_data(xls_path, year, month):
             wbc_start = i
             break
 
-    # Find the 2025/26 proj row
     proj_row_start = 0
     for i in range(wbc_start, len(wheat_rows)):
         if '2025/26' in str(wheat_rows[i][0]):
@@ -224,14 +211,12 @@ def extract_data(xls_path, year, month):
     def get_wbc_row(label, start=proj_row_start):
         for i in range(start, min(start+15, len(wheat_rows))):
             if str(wheat_rows[i][1]).strip().startswith(label):
-                # Cols: 3=HRW, 5=HRS, 7=SRW, 8=White, 10=Durum
                 return [safe(wheat_rows[i][3]), safe(wheat_rows[i][5]),
                         safe(wheat_rows[i][7]), safe(wheat_rows[i][8]),
                         safe(wheat_rows[i][10])]
         return [0, 0, 0, 0, 0]
 
-    # FIX: Store wheat by class data separately BEFORE process_dict runs
-    # so it doesn't get mangled by to3()
+    # FIX: Store wheat by class BEFORE process_dict so 5-element arrays stay intact
     wheat_by_class = {
         'labels': ["HRW", "HRS", "SRW", "White", "Durum"],
         'production': get_wbc_row('Production'),
@@ -239,16 +224,11 @@ def extract_data(xls_path, year, month):
         'endStocks': get_wbc_row('Ending Stocks, Total'),
     }
 
-    # Build the data object — use 3 values: [23/24, 24/25, 25/26 cur month]
     def to3(arr):
         """From [23/24, 24/25, prev_month, cur_month] -> [23/24, 24/25, cur_month]"""
         if len(arr) == 4:
             return [arr[0], arr[1], arr[3]]
         return arr[:3]
-
-    def to3_prev(arr):
-        """Get the prev month value for change tracking"""
-        return arr[2] if len(arr) == 4 else 0
 
     def process_dict(d):
         result = {}
@@ -256,8 +236,6 @@ def extract_data(xls_path, year, month):
             if isinstance(v, dict):
                 result[k] = process_dict(v)
             elif isinstance(v, list) and len(v) == 4 and all(isinstance(x, (int, float)) for x in v):
-                # FIX: Only convert 4-element numeric lists (time-series format)
-                # Skip 5-element lists (wheat by class) and non-numeric lists
                 result[k] = to3(v)
             else:
                 result[k] = v
@@ -268,7 +246,6 @@ def extract_data(xls_path, year, month):
     soy_es_prev = soybeans['endStocks'][2] if len(soybeans['endStocks']) >= 3 else 0
     wheat_es_prev = wheat['endStocks'][2] if len(wheat['endStocks']) >= 3 else 0
 
-    # Determine prev month name
     prev_months = ["", "Dec", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov"]
     cur_months = ["", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 
@@ -283,7 +260,7 @@ def extract_data(xls_path, year, month):
         'wheat': process_dict(wheat),
     }
 
-    # FIX: Assign wheat by class AFTER process_dict so the 5-element arrays stay intact
+    # Assign wheat by class AFTER process_dict
     result['wheat']['byClass'] = wheat_by_class
 
     result['corn']['endStocksPrev'] = corn_es_prev
@@ -295,19 +272,37 @@ def extract_data(xls_path, year, month):
 def update_html(data):
     html = TEMPLATE_PATH.read_text(encoding='utf-8')
     
-    # Replace the WASDE_DATA block
     data_json = json.dumps(data, indent=2)
-    pattern = r'const WASDE_DATA = \{.*?\};\s*\n// ========== END DATA =========='
-    replacement = f'const WASDE_DATA = {data_json};\n// ========== END DATA =========='
     
-    new_html = re.sub(pattern, replacement, html, flags=re.DOTALL)
+    # FIX: More robust regex - flexible whitespace, case-insensitive END DATA marker
+    pattern = r'const\s+WASDE_DATA\s*=\s*\{.*?\}\s*;\s*\n\s*//\s*=+\s*END\s+DATA\s*=+'
     
-    if new_html == html:
+    match = re.search(pattern, html, flags=re.DOTALL)
+    if not match:
+        # Diagnostic: show what's around WASDE_DATA in the file
+        idx = html.find('WASDE_DATA')
+        if idx >= 0:
+            print(f"  Found 'WASDE_DATA' at position {idx}")
+            snippet = html[idx:idx+80].replace('\n', '\\n').replace('\r', '\\r')
+            print(f"  Snippet: {snippet}")
+            # Find END DATA
+            eidx = html.find('END DATA')
+            if eidx >= 0:
+                before_end = html[max(0,eidx-40):eidx+30].replace('\n', '\\n').replace('\r', '\\r')
+                print(f"  Found 'END DATA' at position {eidx}")
+                print(f"  Context: {before_end}")
+            else:
+                print("  'END DATA' NOT FOUND in file!")
+        else:
+            print("  'WASDE_DATA' NOT FOUND in file!")
         print("WARNING: Could not find WASDE_DATA block to replace!")
         return False
     
+    replacement = f'const WASDE_DATA = {data_json};\n// ========== END DATA =========='
+    new_html = html[:match.start()] + replacement + html[match.end():]
+    
     TEMPLATE_PATH.write_text(new_html, encoding='utf-8')
-    print(f"Updated {TEMPLATE_PATH}")
+    print(f"  Updated {TEMPLATE_PATH}")
     return True
 
 def main():
@@ -329,20 +324,21 @@ def main():
     print(f"Soy price:  ${data['soybeans']['price'][2]}/bu  Ending stocks: {data['soybeans']['endStocks'][2]} mil bu")
     print(f"Wheat price: ${data['wheat']['price'][2]}/bu  Ending stocks: {data['wheat']['endStocks'][2]} mil bu")
     
-    # Print soybean meal values to verify fix
+    # Verify soybean meal
     meal = data['soybeans']['meal']
     print(f"\nSoy meal — Production: {meal['production']}  Price: {meal['price']}  Exports: {meal['exports']}")
     if all(v == 0 for sublist in [meal['production'], meal['price'], meal['exports']] for v in sublist):
         print("  ⚠️  Soybean meal still showing zeros — check label matching against USDA spreadsheet")
+    else:
+        print("  ✅ Soybean meal data populated!")
     
-    # Print wheat by class to verify fix
+    # Verify wheat by class
     wbc = data['wheat']['byClass']
-    print(f"Wheat by class production: {wbc['production']} (should have 5 values)")
+    print(f"Wheat by class production: {wbc['production']} ({len(wbc['production'])} values)")
     
     print("\nUpdating HTML...")
     if update_html(data):
         print("\n✅ Dashboard updated successfully!")
-        # Clean up downloaded file
         xls.unlink()
         print(f"  Cleaned up {xls.name}")
     else:
