@@ -514,11 +514,14 @@ new Chart(document.getElementById('priceChart'), { type: 'line', data: {
   ]
 }, options: baseOpts() });
 
-// Stocks comparison
+// Stocks comparison — colored by commodity
 new Chart(document.getElementById('stocksChart'), { type: 'bar', data: {
-  labels: ['Corn', 'Soybeans', 'Wheat'],
-  datasets: D.years.map((y,i) => ({ label: y, data: [c.endStocks[i], s.endStocks[i], w.endStocks[i]],
-    backgroundColor: ['#475569','#64748b','#94a3b8'][i] }))
+  labels: D.years,
+  datasets: [
+    { label: 'Corn', data: c.endStocks, backgroundColor: colors.corn },
+    { label: 'Soybeans', data: s.endStocks, backgroundColor: colors.soy },
+    { label: 'Wheat', data: w.endStocks, backgroundColor: colors.wheat },
+  ]
 }, options: baseOpts() });
 
 // Wheat by class
@@ -607,11 +610,15 @@ function renderSecondary() {
     }
   }});
 
-  // Ending stocks comparison (secondary)
+  // Ending stocks comparison (secondary) — colored by commodity
   new Chart(document.getElementById('stocksChart2'), { type: 'bar', data: {
-    labels: ['Rice (Mil Cwt)', 'Cotton (Mil Bales)', 'Sorghum (Mil Bu)', 'Oats (Mil Bu)'],
-    datasets: D.years.map((y,i) => ({ label: y, data: [ri.endStocks[i], co.endStocks[i], sg.endStocks[i], oa.endStocks[i]],
-      backgroundColor: ['#475569','#64748b','#94a3b8'][i] }))
+    labels: D.years,
+    datasets: [
+      { label: 'Rice (Mil Cwt)', data: ri.endStocks, backgroundColor: colors.rice },
+      { label: 'Cotton (Mil Bales)', data: co.endStocks, backgroundColor: colors.cotton },
+      { label: 'Sorghum (Mil Bu)', data: sg.endStocks, backgroundColor: colors.sorghum },
+      { label: 'Oats (Mil Bu)', data: oa.endStocks, backgroundColor: colors.oats },
+    ]
   }, options: baseOpts() });
 }
 </script>
