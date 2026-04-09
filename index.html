@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>WASDE Dashboard — Innovative Grain</title>
-<meta name="description" content="USDA WASDE Report visualization. Updated monthly by Innovative Grain.">
+<meta name="description" content="USDA WASDE Report visualization for Corn, Soybeans, Wheat, Rice, Cotton and more. Updated monthly by Innovative Grain.">
 <link rel="icon" href="https://img1.wsimg.com/isteam/ip/d2f2d4ff-2aae-4b8a-8522-9cac76c56a33/favicon/ee0e1927-2de4-44d4-b2a9-66efba47c385/065743bd-250f-4fb0-9d89-a35612d466cd.jpeg" />
 <meta property="og:title" content="WASDE Dashboard — Innovative Grain">
 <meta property="og:description" content="Interactive USDA WASDE supply & demand visualizations.">
@@ -27,20 +27,31 @@
   .powered-by a { color: #4ade80; text-decoration: none; }
   .powered-by a:hover { text-decoration: underline; }
 
-  /* Toggle Bar */
-  .toggle-bar { display: flex; justify-content: center; gap: 8px; padding: 16px 32px; background: #0d1b2a; border-bottom: 1px solid #1a2744; }
-  .toggle-btn { background: #1e293b; border: 2px solid #334155; color: #94a3b8; padding: 10px 28px; border-radius: 10px; cursor: pointer; font-size: 14px; font-weight: 600; transition: all 0.2s; font-family: inherit; }
-  .toggle-btn:hover { border-color: #64748b; color: #e2e8f0; }
-  .toggle-btn.active { border-color: #4ade80; color: #4ade80; background: rgba(74, 222, 128, 0.08); }
+  /* Group Toggle */
+  .group-toggle { display: flex; justify-content: center; gap: 10px; padding: 18px 32px 4px; }
+  .group-btn { background: #1e293b; border: 2px solid #334155; color: #94a3b8; padding: 10px 30px; border-radius: 10px; cursor: pointer; font-size: 14px; font-weight: 600; font-family: inherit; transition: all .2s; letter-spacing: 0.2px; }
+  .group-btn:hover { border-color: #64748b; color: #e2e8f0; }
+  .group-btn.active { border-color: #4ade80; color: #4ade80; background: rgba(74,222,128,.08); }
 
-  .crop-group { display: none; }
-  .crop-group.active { display: block; }
+  /* Commodity Sub-tabs */
+  .commodity-tabs { display: flex; justify-content: center; gap: 8px; padding: 14px 32px 0; flex-wrap: wrap; }
+  .com-tab { background: #1e293b; border: 1.5px solid #334155; color: #94a3b8; padding: 7px 20px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; font-family: inherit; transition: all .2s; }
+  .com-tab:hover { border-color: #64748b; color: #e2e8f0; }
+  .com-tab.active-rice    { border-color: #22d3ee; color: #22d3ee; background: rgba(34,211,238,.08); }
+  .com-tab.active-cotton  { border-color: #f472b6; color: #f472b6; background: rgba(244,114,182,.08); }
+  .com-tab.active-sorghum { border-color: #a78bfa; color: #a78bfa; background: rgba(167,139,250,.08); }
+  .com-tab.active-oats    { border-color: #fbbf24; color: #fbbf24; background: rgba(251,191,36,.08); }
+  .com-tab.active-canola  { border-color: #4ade80; color: #4ade80; background: rgba(74,222,128,.08); }
+
+  .crop-content { display: none; }
+  .crop-content.active { display: block; }
 
   /* Layout */
-  .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; padding: 20px 32px 0; }
-  .kpi-row-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; padding: 20px 32px 0; }
-  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; padding: 20px 32px; }
-  .grid2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; padding: 0 32px 20px; }
+  .kpi-row   { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; padding: 20px 32px 0; }
+  .kpi-row-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; padding: 20px 32px 0; }
+  .grid  { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; padding: 20px 32px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 20px 32px; }
+  .grid2.no-top { padding-top: 0; }
   .card { background: #1e293b; border-radius: 12px; border: 1px solid #334155; overflow: hidden; }
   .card-header { padding: 16px 20px 8px; display: flex; justify-content: space-between; align-items: center; }
   .card-header h2 { font-size: 17px; font-weight: 600; }
@@ -49,6 +60,7 @@
   .chart-container { position: relative; height: 220px; }
   .full-width { grid-column: 1 / -1; }
   .two-col { grid-column: span 2; }
+  .tbl-wrap { padding: 0 32px 20px; }
 
   /* KPIs */
   .kpi { background: #1e293b; border-radius: 10px; border: 1px solid #334155; padding: 14px 18px; }
@@ -68,32 +80,33 @@
 
   /* Commodity colors */
   .corn { color: #fbbf24; }
-  .soy { color: #34d399; }
+  .soy  { color: #34d399; }
   .wheat { color: #f97316; }
-  .rice { color: #22d3ee; }
-  .cotton { color: #f472b6; }
-  .sorghum { color: #a78bfa; }
-  .oats { color: #fb923c; }
+  .rice-clr    { color: #22d3ee; }
+  .cotton-clr  { color: #f472b6; }
+  .sorghum-clr { color: #a78bfa; }
+  .oats-clr    { color: #fbbf24; }
+  .canola-clr  { color: #4ade80; }
 
-  .section-title { padding: 20px 32px 6px; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: #4a6741; font-weight: 600; }
+  .section-title { padding: 20px 32px 6px; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: #4a6741; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+  .data-badge { font-size: 10px; background: rgba(251,191,36,.1); color: #fbbf24; border: 1px solid rgba(251,191,36,.2); border-radius: 4px; padding: 2px 8px; font-weight: 500; text-transform: none; letter-spacing: 0; }
 
   .footer { padding: 16px 32px; text-align: center; color: #475569; font-size: 11px; border-top: 1px solid #1a2744; }
   .footer a { color: #4ade80; text-decoration: none; }
 
-  /* Jan vs Feb change highlight */
   .month-chg { display: inline-block; font-size: 10px; padding: 1px 6px; border-radius: 4px; margin-left: 4px; }
-  .month-chg.up { background: rgba(74,222,128,0.15); color: #4ade80; }
+  .month-chg.up   { background: rgba(74,222,128,0.15); color: #4ade80; }
   .month-chg.down { background: rgba(248,113,113,0.15); color: #f87171; }
   .month-chg.flat { background: rgba(148,163,184,0.1); color: #64748b; }
 
   @media (max-width: 900px) {
-    .grid { grid-template-columns: 1fr; }
-    .grid2 { grid-template-columns: 1fr; }
-    .kpi-row, .kpi-row-5 { grid-template-columns: repeat(2, 1fr); }
+    .grid, .grid2 { grid-template-columns: 1fr; }
+    .kpi-row, .kpi-row-3 { grid-template-columns: repeat(2, 1fr); }
     .two-col { grid-column: span 1; }
     .header { flex-direction: column; align-items: flex-start; }
     .header-right { margin-left: 0; text-align: left; }
-    .toggle-bar { flex-wrap: wrap; }
+    .group-toggle { flex-direction: column; align-items: stretch; }
+    .commodity-tabs { gap: 6px; }
   }
 </style>
 </head>
@@ -104,7 +117,7 @@
   <img class="header-logo" src="https://img1.wsimg.com/isteam/ip/d2f2d4ff-2aae-4b8a-8522-9cac76c56a33/favicon/ee0e1927-2de4-44d4-b2a9-66efba47c385/065743bd-250f-4fb0-9d89-a35612d466cd.jpeg" alt="Innovative Grain logo" />
   <div class="header-text">
     <h1><span>Innovative Grain</span> — WASDE Dashboard</h1>
-    <div class="subtitle" id="subtitleText">U.S. Supply & Demand Estimates for Corn, Soybeans, and Wheat</div>
+    <div class="subtitle">U.S. Supply & Demand Estimates — USDA World Agricultural Outlook Board</div>
   </div>
   <div class="header-right">
     <div class="report-id" id="reportId">WASDE-669</div>
@@ -113,14 +126,14 @@
 </div>
 <div class="powered-by">Data from <a href="https://www.usda.gov/oce/commodity/wasde" target="_blank" rel="noopener">USDA World Agricultural Outlook Board</a> · Auto-updated monthly · <a href="https://www.innovativegrain.ai" target="_blank" rel="noopener">innovativegrain.ai</a></div>
 
-<!-- TOGGLE -->
-<div class="toggle-bar">
-  <button class="toggle-btn active" onclick="switchGroup('primary')" id="btn-primary">Corn · Soybeans · Wheat</button>
-  <button class="toggle-btn" onclick="switchGroup('secondary')" id="btn-secondary">Rice · Cotton · Sorghum · Oats</button>
+<!-- GROUP TOGGLE -->
+<div class="group-toggle">
+  <button class="group-btn active" id="grpBtn1" onclick="switchGroup(1)">🌽 Corn · Soybeans · Wheat</button>
+  <button class="group-btn" id="grpBtn2" onclick="switchGroup(2)">🌾 Rice · Cotton · More</button>
 </div>
 
-<!-- ==================== GROUP 1: PRIMARY CROPS ==================== -->
-<div class="crop-group active" id="group-primary">
+<!-- ===== GROUP 1: Corn / Soybeans / Wheat ===== -->
+<div id="group1">
 
 <div class="section-title">Average Farm Price Outlook</div>
 <div class="kpi-row" id="kpiRow"></div>
@@ -162,214 +175,725 @@
   <div class="card full-width" id="soyProductsCard"></div>
 </div>
 
-</div><!-- end group-primary -->
+</div><!-- end group1 -->
 
-<!-- ==================== GROUP 2: SECONDARY CROPS ==================== -->
-<div class="crop-group" id="group-secondary">
+<!-- ===== GROUP 2: Rice / Cotton / Sorghum / Oats / Canola ===== -->
+<div id="group2" style="display:none">
 
-<div class="section-title">Average Farm Price Outlook</div>
-<div class="kpi-row" id="kpiRow2"></div>
-
-<div class="grid">
-  <!-- Rice -->
-  <div class="card two-col">
-    <div class="card-header"><h2>🍚 U.S. Rice Supply & Use</h2><span class="unit">Million Cwt</span></div>
-    <div class="card-body"><div class="chart-container"><canvas id="riceChart"></canvas></div></div>
-  </div>
-  <div class="card" id="riceTable"></div>
-
-  <!-- Cotton -->
-  <div class="card two-col">
-    <div class="card-header"><h2>🏵️ U.S. Cotton Supply & Use</h2><span class="unit">Mil 480-lb Bales</span></div>
-    <div class="card-body"><div class="chart-container"><canvas id="cottonChart"></canvas></div></div>
-  </div>
-  <div class="card" id="cottonTable"></div>
-
-  <!-- Sorghum -->
-  <div class="card two-col">
-    <div class="card-header"><h2>🌿 U.S. Sorghum Supply & Use</h2><span class="unit">Million Bushels</span></div>
-    <div class="card-body"><div class="chart-container"><canvas id="sorghumChart"></canvas></div></div>
-  </div>
-  <div class="card" id="sorghumTable"></div>
-
-  <!-- Oats -->
-  <div class="card two-col">
-    <div class="card-header"><h2>🌾 U.S. Oats Supply & Use</h2><span class="unit">Million Bushels</span></div>
-    <div class="card-body"><div class="chart-container"><canvas id="oatsChart"></canvas></div></div>
-  </div>
-  <div class="card" id="oatsTable"></div>
-
-  <!-- Price Trend for secondary crops -->
-  <div class="card full-width">
-    <div class="card-header"><h2>📉 Average Farm Price Trend</h2></div>
-    <div class="card-body"><div class="chart-container"><canvas id="priceChart2"></canvas></div></div>
-  </div>
-
-  <!-- Ending Stocks Comparison -->
-  <div class="card full-width">
-    <div class="card-header"><h2>📊 Ending Stocks Comparison</h2></div>
-    <div class="card-body"><div class="chart-container"><canvas id="stocksChart2"></canvas></div></div>
-  </div>
+<div class="section-title">
+  Minor Grains, Fibers &amp; Oilseeds
+  <span class="data-badge" id="g2Badge">WASDE-668 Feb 2026 · Run update_wasde.py to refresh</span>
 </div>
 
-</div><!-- end group-secondary -->
+<div class="commodity-tabs">
+  <button class="com-tab active-rice"   id="comTab-rice"    onclick="showCrop('rice')">🌾 Rice</button>
+  <button class="com-tab"               id="comTab-cotton"  onclick="showCrop('cotton')">🌿 Cotton</button>
+  <button class="com-tab"               id="comTab-sorghum" onclick="showCrop('sorghum')">🌾 Sorghum</button>
+  <button class="com-tab"               id="comTab-oats"    onclick="showCrop('oats')">🥣 Oats</button>
+  <button class="com-tab"               id="comTab-canola"  onclick="showCrop('canola')">🌻 Canola</button>
+</div>
+
+<!-- RICE -->
+<div id="crop-rice" class="crop-content active">
+  <div class="kpi-row" id="g2-rice-kpis"></div>
+  <div class="grid2">
+    <div class="card">
+      <div class="card-header"><h2 class="rice-clr">U.S. Rice Supply &amp; Use</h2><span class="unit">Mil Cwt</span></div>
+      <div class="card-body"><div class="chart-container"><canvas id="g2_riceUSBar"></canvas></div></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h2 class="rice-clr">U.S. Rice Avg Farm Price</h2><span class="unit">$/cwt</span></div>
+      <div class="card-body"><div class="chart-container"><canvas id="g2_ricePrice"></canvas></div></div>
+    </div>
+  </div>
+  <div class="grid2 no-top">
+    <div class="card">
+      <div class="card-header"><h2 class="rice-clr">World Rice Supply &amp; Use</h2><span class="unit">MMT Milled</span></div>
+      <div class="card-body"><div class="chart-container"><canvas id="g2_riceWorldBar"></canvas></div></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h2 class="rice-clr">World Top Exporters 2025/26</h2><span class="unit">MMT</span></div>
+      <div class="card-body"><div class="chart-container"><canvas id="g2_riceExporters"></canvas></div></div>
+    </div>
+  </div>
+  <div class="tbl-wrap"><div class="card" id="g2-rice-table"></div></div>
+</div>
+
+<!-- COTTON -->
+<div id="crop-cotton" class="crop-content">
+  <div class="kpi-row" id="g2-cotton-kpis"></div>
+  <div class="grid2">
+    <div class="card">
+      <div class="card-header"><h2 class="cotton-clr">U.S. Cotton Supply &amp; Use</h2><span class="unit">Mil 480-lb Bales</span></div>
+      <div class="card-body"><div class="chart-container"><canvas id="g2_cottonUSBar"></canvas></div></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h2 class="cotton-clr">U.S. Cotton Avg Farm Price</h2><span class="unit">¢/lb</span></div>
+      <div class="card-body"><div class="chart-container"><canvas id="g2_cottonPrice"></canvas></div></div>
+    </div>
+  </div>
+  <div class="grid2 no-top">
+    <div class="card">
+      <div class="card-header"><h2 class="cotton-clr">World Cotton Supply &amp; Use</h2><span class="unit">Mil 480-lb Bales</span></div>
+      <div class="card-body"><div class="chart-container"><canvas id="g2_cottonWorldBar"></canvas></div></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h2 class="cotton-clr">World Top Producers 2025/26</h2><span class="unit">Mil Bales</span></div>
+      <div class="card-body"><div class="chart-container"><canvas id="g2_cottonProducers"></canvas></div></div>
+    </div>
+  </div>
+  <div class="tbl-wrap"><div class="card" id="g2-cotton-table"></div></div>
+</div>
+
+<!-- SORGHUM -->
+<div id="crop-sorghum" class="crop-content">
+  <div class="kpi-row" id="g2-sorghum-kpis"></div>
+  <div class="grid2">
+    <div class="card">
+      <div class="card-header"><h2 class="sorghum-clr">U.S. Sorghum Supply &amp; Use</h2><span class="unit">Mil Bu</span></div>
+      <div class="card-body"><div class="chart-container"><canvas id="g2_sorghumBar"></canvas></div></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h2 class="sorghum-clr">U.S. Sorghum Avg Farm Price</h2><span class="unit">$/bu</span></div>
+      <div class="card-body"><div class="chart-container"><canvas id="g2_sorghumPrice"></canvas></div></div>
+    </div>
+  </div>
+  <div class="tbl-wrap"><div class="card" id="g2-sorghum-table"></div></div>
+</div>
+
+<!-- OATS -->
+<div id="crop-oats" class="crop-content">
+  <div class="kpi-row" id="g2-oats-kpis"></div>
+  <div class="grid2">
+    <div class="card">
+      <div class="card-header"><h2 class="oats-clr">U.S. Oats Supply &amp; Use</h2><span class="unit">Mil Bu</span></div>
+      <div class="card-body"><div class="chart-container"><canvas id="g2_oatsBar"></canvas></div></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h2 class="oats-clr">U.S. Oats Avg Farm Price</h2><span class="unit">$/bu</span></div>
+      <div class="card-body"><div class="chart-container"><canvas id="g2_oatsPrice"></canvas></div></div>
+    </div>
+  </div>
+  <div class="tbl-wrap"><div class="card" id="g2-oats-table"></div></div>
+</div>
+
+<!-- CANOLA -->
+<div id="crop-canola" class="crop-content">
+  <div class="kpi-row-3" id="g2-canola-kpis"></div>
+  <div class="grid2">
+    <div class="card">
+      <div class="card-header"><h2 class="canola-clr">World Canola/Rapeseed Supply &amp; Use</h2><span class="unit">MMT</span></div>
+      <div class="card-body"><div class="chart-container"><canvas id="g2_canolaBar"></canvas></div></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><h2 class="canola-clr">World Canola Production &amp; Crushings</h2><span class="unit">MMT</span></div>
+      <div class="card-body"><div class="chart-container"><canvas id="g2_canolaLine"></canvas></div></div>
+    </div>
+  </div>
+  <div class="tbl-wrap"><div class="card" id="g2-canola-table"></div></div>
+</div>
+
+</div><!-- end group2 -->
 
 <div class="footer">
   Source: USDA WASDE Report · <a href="https://www.usda.gov/oce/commodity/wasde" target="_blank">usda.gov/oce/commodity/wasde</a><br>
-  &copy; 2026 <a href="https://www.innovativegrain.ai" target="_blank">Innovative Grain</a> · Dashboard auto-updates within 24 hours of each monthly WASDE release
+  © 2026 <a href="https://www.innovativegrain.ai" target="_blank">Innovative Grain</a> · Dashboard auto-updates within 24 hours of each monthly WASDE release
 </div>
 
 <script>
 // ========== DATA (updated by build script) ==========
 const WASDE_DATA = {
-  "reportId": "WASDE-669",
-  "reportDate": "March 2026",
-  "years": ["2023/24", "2024/25 Est.", "2025/26 Proj."],
-  "prevMonth": "Feb",
-  "curMonth": "Mar",
+  "reportId": "WASDE-670",
+  "reportDate": "April 2026",
+  "years": [
+    "2023/24",
+    "2024/25 Est.",
+    "2025/26 Proj."
+  ],
+  "prevMonth": "Mar",
+  "curMonth": "Apr",
   "corn": {
-    "price": [4.55, 4.24, 4.1],
-    "planted": [94.6, 90.9, 98.8],
-    "harvested": [86.5, 83.0, 91.3],
-    "yield": [177.3, 179.3, 186.5],
-    "begStocks": [1360.0, 1763.0, 1551.0],
-    "production": [15341.0, 14892.0, 17021.0],
-    "imports": [28.0, 22.0, 25.0],
-    "supplyTotal": [16729.0, 16677.0, 18597.0],
-    "feedResidual": [5831.0, 5454.0, 6200.0],
-    "fsi": [6880.0, 6813.0, 6970.0],
-    "ethanol": [5489.0, 5436.0, 5600.0],
-    "domesticTotal": [12711.0, 12267.0, 13170.0],
-    "exports": [2255.0, 2858.0, 3300.0],
-    "useTotal": [14966.0, 15126.0, 16470.0],
-    "endStocks": [1763.0, 1551.0, 2127.0],
+    "price": [
+      4.55,
+      4.24,
+      4.15
+    ],
+    "planted": [
+      94.6,
+      90.9,
+      98.8
+    ],
+    "harvested": [
+      86.5,
+      83.0,
+      91.3
+    ],
+    "yield": [
+      177.3,
+      179.3,
+      186.5
+    ],
+    "begStocks": [
+      1360.0,
+      1763.0,
+      1551.0
+    ],
+    "production": [
+      15341.0,
+      14892.0,
+      17021.0
+    ],
+    "imports": [
+      28.0,
+      22.0,
+      25.0
+    ],
+    "supplyTotal": [
+      16729.0,
+      16677.0,
+      18597.0
+    ],
+    "feedResidual": [
+      5831.0,
+      5454.0,
+      6200.0
+    ],
+    "fsi": [
+      6880.0,
+      6813.0,
+      6970.0
+    ],
+    "ethanol": [
+      5489.0,
+      5436.0,
+      5600.0
+    ],
+    "domesticTotal": [
+      12711.0,
+      12267.0,
+      13170.0
+    ],
+    "exports": [
+      2255.0,
+      2858.0,
+      3300.0
+    ],
+    "useTotal": [
+      14966.0,
+      15126.0,
+      16470.0
+    ],
+    "endStocks": [
+      1763.0,
+      1551.0,
+      2127.0
+    ],
     "endStocksPrev": 2127.0
   },
   "soybeans": {
-    "price": [12.4, 10.0, 10.2],
-    "planted": [83.6, 87.3, 81.2],
-    "harvested": [82.3, 86.2, 80.4],
-    "yield": [50.6, 50.7, 53.0],
-    "begStocks": [264.0, 342.0, 325.0],
-    "production": [4162.0, 4374.0, 4262.0],
-    "imports": [21.0, 29.0, 25.0],
-    "supplyTotal": [4447.0, 4746.0, 4612.0],
-    "crushings": [2285.0, 2445.0, 2575.0],
-    "exports": [1700.0, 1882.0, 1575.0],
-    "seed": [75.0, 70.0, 73.0],
-    "residual": [44.0, 23.0, 39.0],
-    "useTotal": [4105.0, 4421.0, 4262.0],
-    "endStocks": [342.0, 325.0, 350.0],
+    "price": [
+      12.4,
+      10.0,
+      10.3
+    ],
+    "planted": [
+      83.6,
+      87.3,
+      81.2
+    ],
+    "harvested": [
+      82.3,
+      86.2,
+      80.4
+    ],
+    "yield": [
+      50.6,
+      50.7,
+      53.0
+    ],
+    "begStocks": [
+      264.0,
+      342.0,
+      325.0
+    ],
+    "production": [
+      4162.0,
+      4374.0,
+      4262.0
+    ],
+    "imports": [
+      21.0,
+      29.0,
+      25.0
+    ],
+    "supplyTotal": [
+      4447.0,
+      4746.0,
+      4612.0
+    ],
+    "crushings": [
+      2285.0,
+      2445.0,
+      2610.0
+    ],
+    "exports": [
+      1700.0,
+      1882.0,
+      1540.0
+    ],
+    "seed": [
+      75.0,
+      70.0,
+      73.0
+    ],
+    "residual": [
+      44.0,
+      23.0,
+      39.0
+    ],
+    "useTotal": [
+      4105.0,
+      4421.0,
+      4262.0
+    ],
+    "endStocks": [
+      342.0,
+      325.0,
+      350.0
+    ],
     "oil": {
-      "price": [47.28, 47.59, 55.0],
-      "production": [27093.0, 29218.0, 29920.0],
-      "domesticUse": [27153.0, 26891.0, 29050.0],
-      "biofuel": [12995.0, 11758.0, 14000.0],
-      "exports": [617.0, 2492.0, 1200.0],
-      "endStocks": [1551.0, 1747.0, 1782.0]
+      "price": [
+        47.28,
+        47.59,
+        59.0
+      ],
+      "production": [
+        27093.0,
+        29218.0,
+        30330.0
+      ],
+      "domesticUse": [
+        27153.0,
+        26891.0,
+        29350.0
+      ],
+      "biofuel": [
+        12995.0,
+        11758.0,
+        14000.0
+      ],
+      "exports": [
+        617.0,
+        2492.0,
+        1200.0
+      ],
+      "endStocks": [
+        1551.0,
+        1747.0,
+        1842.0
+      ]
     },
     "meal": {
-      "price": [384.11, 299.77, 300.0],
-      "production": [54106.0, 58443.0, 61077.0],
-      "domesticUse": [38657.0, 41041.0, 42425.0],
-      "exports": [16054.0, 18265.0, 19400.0],
-      "endStocks": [453.0, 398.0, 450.0]
+      "price": [
+        384.11,
+        299.77,
+        310.0
+      ],
+      "production": [
+        54106.0,
+        58443.0,
+        61877.0
+      ],
+      "domesticUse": [
+        38657.0,
+        41041.0,
+        43225.0
+      ],
+      "exports": [
+        16054.0,
+        18265.0,
+        19400.0
+      ],
+      "endStocks": [
+        453.0,
+        398.0,
+        450.0
+      ]
     },
     "endStocksPrev": 350.0
   },
   "wheat": {
-    "price": [6.96, 5.52, 4.95],
-    "planted": [49.6, 46.3, 45.3],
-    "harvested": [37.1, 38.6, 37.2],
-    "yield": [48.7, 51.2, 53.3],
-    "begStocks": [570.0, 696.0, 855.0],
-    "production": [1804.0, 1979.0, 1985.0],
-    "imports": [138.0, 149.0, 120.0],
-    "supplyTotal": [2511.0, 2824.0, 2959.0],
-    "food": [961.0, 969.0, 967.0],
-    "seed": [62.0, 61.0, 61.0],
-    "feedResidual": [86.0, 113.0, 100.0],
-    "domesticTotal": [1109.0, 1143.0, 1128.0],
-    "exports": [706.0, 826.0, 900.0],
-    "useTotal": [1815.0, 1969.0, 2028.0],
-    "endStocks": [696.0, 855.0, 931.0],
+    "price": [
+      6.96,
+      5.52,
+      5.0
+    ],
+    "planted": [
+      49.6,
+      46.3,
+      45.3
+    ],
+    "harvested": [
+      37.1,
+      38.6,
+      37.2
+    ],
+    "yield": [
+      48.7,
+      51.2,
+      53.3
+    ],
+    "begStocks": [
+      570.0,
+      696.0,
+      855.0
+    ],
+    "production": [
+      1804.0,
+      1979.0,
+      1985.0
+    ],
+    "imports": [
+      138.0,
+      149.0,
+      125.0
+    ],
+    "supplyTotal": [
+      2511.0,
+      2824.0,
+      2964.0
+    ],
+    "food": [
+      961.0,
+      969.0,
+      967.0
+    ],
+    "seed": [
+      62.0,
+      61.0,
+      60.0
+    ],
+    "feedResidual": [
+      86.0,
+      113.0,
+      100.0
+    ],
+    "domesticTotal": [
+      1109.0,
+      1143.0,
+      1127.0
+    ],
+    "exports": [
+      706.0,
+      826.0,
+      900.0
+    ],
+    "useTotal": [
+      1815.0,
+      1969.0,
+      2027.0
+    ],
+    "endStocks": [
+      696.0,
+      855.0,
+      938.0
+    ],
     "byClass": {
-      "labels": ["HRW", "HRS", "SRW", "White", "Durum"],
-      "production": [804.0, 458.0, 353.0, 283.0, 86.0],
-      "exports": [320.0, 230.0, 115.0, 210.0, 25.0],
-      "endStocks": [450.0, 231.0, 141.0, 78.0, 31.0]
+      "labels": [
+        "HRW",
+        "HRS",
+        "SRW",
+        "White",
+        "Durum"
+      ],
+      "production": [
+        804.0,
+        458.0,
+        353.0,
+        283.0,
+        86.0
+      ],
+      "exports": [
+        320.0,
+        230.0,
+        120.0,
+        200.0,
+        30.0
+      ],
+      "endStocks": [
+        447.0,
+        232.0,
+        136.0,
+        89.0,
+        34.0
+      ]
     },
     "endStocksPrev": 931.0
   },
   "rice": {
-    "price": [17.30, 15.10, 12.10],
-    "planted": [2.90, 2.92, 2.81],
-    "harvested": [2.85, 2.87, 2.74],
-    "yield": [7641, 7753, 7544],
-    "begStocks": [30.3, 39.8, 53.9],
-    "production": [218.0, 222.6, 206.7],
-    "imports": [44.4, 49.3, 47.7],
-    "supplyTotal": [292.6, 311.7, 308.3],
-    "domesticUse": [153.7, 167.3, 171.0],
-    "exports": [99.0, 90.5, 87.0],
-    "useTotal": [252.8, 257.8, 258.0],
-    "endStocks": [39.8, 53.9, 50.3],
-    "endStocksPrev": 50.3,
+    "price": [
+      17.3,
+      15.1,
+      12.1
+    ],
+    "production": [
+      218.0,
+      222.6,
+      206.7
+    ],
+    "begStocks": [
+      30.3,
+      39.8,
+      53.9
+    ],
+    "imports": [
+      44.4,
+      49.3,
+      45.7
+    ],
+    "supplyTotal": [
+      292.6,
+      311.7,
+      306.3
+    ],
+    "domesticUse": [
+      153.7,
+      167.3,
+      169.0
+    ],
+    "exports": [
+      99.0,
+      90.5,
+      82.0
+    ],
+    "useTotal": [
+      252.8,
+      257.8,
+      251.0
+    ],
+    "endStocks": [
+      39.8,
+      53.9,
+      55.3
+    ],
+    "years": [
+      "2023/24",
+      "2024/25 Est.",
+      "2025/26 Apr"
+    ],
+    "reportNote": "WASDE-670 April 2026",
     "unit": "Mil Cwt",
-    "priceUnit": "$/cwt"
+    "world": {
+      "production": [
+        0,
+        0,
+        0
+      ],
+      "consumption": [
+        0,
+        0,
+        0
+      ],
+      "trade": [
+        0,
+        0,
+        0
+      ],
+      "endStocks": [
+        0,
+        0,
+        0
+      ]
+    }
   },
   "cotton": {
-    "price": [76.10, 63.00, 60.00],
-    "planted": [10.23, 11.18, 9.28],
-    "harvested": [6.44, 7.81, 7.80],
-    "yield": [899, 886, 856],
-    "begStocks": [4.65, 3.15, 4.00],
-    "production": [12.07, 14.41, 13.92],
-    "imports": [0.00, 0.00, 0.01],
-    "supplyTotal": [16.72, 17.57, 17.92],
-    "domesticUse": [1.85, 1.70, 1.60],
-    "exports": [11.75, 11.90, 12.00],
-    "useTotal": [13.60, 13.60, 13.60],
-    "endStocks": [3.15, 4.00, 4.40],
-    "endStocksPrev": 4.40,
+    "price": [
+      76.1,
+      63.2,
+      61.0
+    ],
+    "production": [
+      12.07,
+      14.41,
+      13.92
+    ],
+    "begStocks": [
+      4.65,
+      3.15,
+      4.0
+    ],
+    "imports": [
+      0.0,
+      0.0,
+      0.01
+    ],
+    "supplyTotal": [
+      16.72,
+      17.57,
+      17.92
+    ],
+    "domesticUse": [
+      1.85,
+      1.7,
+      1.6
+    ],
+    "exports": [
+      11.75,
+      11.9,
+      12.0
+    ],
+    "useTotal": [
+      13.6,
+      13.6,
+      13.6
+    ],
+    "endStocks": [
+      3.15,
+      4.0,
+      4.4
+    ],
+    "years": [
+      "2023/24",
+      "2024/25 Est.",
+      "2025/26 Apr"
+    ],
+    "reportNote": "WASDE-670 April 2026",
     "unit": "Mil 480-lb Bales",
-    "priceUnit": "cents/lb"
+    "world": {
+      "production": [
+        0,
+        0,
+        0
+      ],
+      "consumption": [
+        0,
+        0,
+        0
+      ],
+      "trade": [
+        0,
+        0,
+        0
+      ],
+      "endStocks": [
+        0,
+        0,
+        0
+      ]
+    }
   },
   "sorghum": {
-    "price": [4.90, 4.30, 3.95],
-    "planted": [6.3, 6.1, 6.5],
-    "harvested": [4.3, 4.6, 5.2],
-    "yield": [51.0, 65.4, 71.1],
-    "begStocks": [16.0, 27.0, 20.0],
-    "production": [220.0, 299.0, 369.0],
-    "imports": [0.0, 0.0, 0.0],
-    "supplyTotal": [236.0, 326.0, 389.0],
-    "feedResidual": [70.0, 80.0, 95.0],
-    "fsi": [25.0, 26.0, 27.0],
-    "exports": [114.0, 200.0, 240.0],
-    "useTotal": [209.0, 306.0, 362.0],
-    "endStocks": [27.0, 20.0, 27.0],
-    "endStocksPrev": 27.0,
-    "unit": "Mil Bu",
-    "priceUnit": "$/bu"
+    "price": [
+      4.93,
+      4.07,
+      3.55
+    ],
+    "production": [
+      318.0,
+      344.0,
+      437.0
+    ],
+    "begStocks": [
+      24.0,
+      33.0,
+      40.0
+    ],
+    "imports": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "supplyTotal": [
+      342.0,
+      377.0,
+      477.0
+    ],
+    "feedResidual": [
+      51.0,
+      140.0,
+      100.0
+    ],
+    "exports": [
+      234.0,
+      98.0,
+      225.0
+    ],
+    "useTotal": [
+      309.0,
+      336.0,
+      440.0
+    ],
+    "endStocks": [
+      33.0,
+      40.0,
+      37.0
+    ],
+    "years": [
+      "2023/24",
+      "2024/25 Est.",
+      "2025/26 Apr"
+    ],
+    "reportNote": "WASDE-670 April 2026",
+    "unit": "Mil Bu"
   },
   "oats": {
-    "price": [3.89, 3.31, 3.20],
-    "planted": [2.6, 2.8, 3.0],
-    "harvested": [0.8, 0.9, 1.0],
-    "yield": [63.5, 65.2, 66.0],
-    "begStocks": [68.0, 72.0, 82.0],
-    "production": [49.0, 57.0, 66.0],
-    "imports": [95.0, 100.0, 90.0],
-    "supplyTotal": [212.0, 229.0, 238.0],
-    "feedResidual": [55.0, 60.0, 60.0],
-    "fsi": [56.0, 57.0, 58.0],
-    "exports": [2.0, 2.0, 2.0],
-    "useTotal": [140.0, 147.0, 148.0],
-    "endStocks": [72.0, 82.0, 90.0],
-    "endStocksPrev": 90.0,
-    "unit": "Mil Bu",
-    "priceUnit": "$/bu"
+    "price": [
+      3.92,
+      3.35,
+      3.25
+    ],
+    "production": [
+      57.0,
+      68.0,
+      70.0
+    ],
+    "begStocks": [
+      35.0,
+      36.0,
+      28.0
+    ],
+    "imports": [
+      74.0,
+      71.0,
+      72.0
+    ],
+    "supplyTotal": [
+      166.0,
+      176.0,
+      170.0
+    ],
+    "foodIndustrial": [
+      80.0,
+      81.0,
+      82.0
+    ],
+    "feedResidual": [
+      47.0,
+      64.0,
+      55.0
+    ],
+    "exports": [
+      2.0,
+      2.0,
+      3.0
+    ],
+    "useTotal": [
+      129.0,
+      148.0,
+      140.0
+    ],
+    "endStocks": [
+      36.0,
+      28.0,
+      30.0
+    ],
+    "years": [
+      "2023/24",
+      "2024/25 Est.",
+      "2025/26 Apr"
+    ],
+    "reportNote": "WASDE-670 April 2026",
+    "unit": "Mil Bu"
   }
 };
 // ========== END DATA ==========
@@ -383,38 +907,30 @@ const fmtChg = (cur, prev) => { const d = cur - prev; return d > 0 ? '+'+fmt(d) 
 document.getElementById('reportId').textContent = D.reportId;
 document.getElementById('reportDate').textContent = D.reportDate;
 
-// ==================== TOGGLE ====================
-let secondaryRendered = false;
-
-function switchGroup(group) {
-  document.querySelectorAll('.crop-group').forEach(el => el.classList.remove('active'));
-  document.querySelectorAll('.toggle-btn').forEach(el => el.classList.remove('active'));
-  document.getElementById('group-' + group).classList.add('active');
-  document.getElementById('btn-' + group).classList.add('active');
-
-  if (group === 'primary') {
-    document.getElementById('subtitleText').textContent = 'U.S. Supply & Demand Estimates for Corn, Soybeans, and Wheat';
-  } else {
-    document.getElementById('subtitleText').textContent = 'U.S. Supply & Demand Estimates for Rice, Cotton, Sorghum, and Oats';
-    if (!secondaryRendered) {
-      renderSecondary();
-      secondaryRendered = true;
-    }
-  }
+// ========== GROUP TOGGLE ==========
+function switchGroup(n) {
+  document.getElementById('group1').style.display = n === 1 ? '' : 'none';
+  document.getElementById('group2').style.display = n === 2 ? '' : 'none';
+  document.getElementById('grpBtn1').classList.toggle('active', n === 1);
+  document.getElementById('grpBtn2').classList.toggle('active', n === 2);
+  if (n === 2 && !group2Init) { group2Init = true; initGroup2Charts(); }
 }
 
-// ==================== PRIMARY CROPS (Group 1) ====================
+// ========== COMMODITY SUB-TABS ==========
+const cropActiveClass = { rice: 'active-rice', cotton: 'active-cotton', sorghum: 'active-sorghum', oats: 'active-oats', canola: 'active-canola' };
+function showCrop(crop) {
+  document.querySelectorAll('.crop-content').forEach(e => e.classList.remove('active'));
+  document.querySelectorAll('.com-tab').forEach(e => { e.className = 'com-tab'; });
+  document.getElementById('crop-' + crop).classList.add('active');
+  document.getElementById('comTab-' + crop).classList.add(cropActiveClass[crop]);
+}
 
-// KPIs
+// ========== GROUP 1 KPIs ==========
 const kpis = [
-  { label: '🌽 Corn Avg Price', value: `$${D.corn.price[2].toFixed(2)}/bu`, cls: 'corn',
-    sub: `from $${D.corn.price[1].toFixed(2)} (24/25)`, dir: D.corn.price[2] >= D.corn.price[1] ? 'up' : 'down' },
-  { label: '🫘 Soybeans Avg Price', value: `$${D.soybeans.price[2].toFixed(2)}/bu`, cls: 'soy',
-    sub: `from $${D.soybeans.price[1].toFixed(2)} (24/25)`, dir: D.soybeans.price[2] >= D.soybeans.price[1] ? 'up' : 'down' },
-  { label: '🌾 Wheat Avg Price', value: `$${D.wheat.price[2].toFixed(2)}/bu`, cls: 'wheat',
-    sub: `from $${D.wheat.price[1].toFixed(2)} (24/25)`, dir: D.wheat.price[2] >= D.wheat.price[1] ? 'up' : 'down' },
-  { label: '🛢️ Soybean Oil Price', value: `${D.soybeans.oil.price[2].toFixed(1)}¢/lb`, cls: '',
-    sub: `from ${D.soybeans.oil.price[1].toFixed(1)}¢ (24/25)`, dir: D.soybeans.oil.price[2] >= D.soybeans.oil.price[1] ? 'up' : 'down' },
+  { label: '🌽 Corn Avg Price',     value: `$${D.corn.price[2].toFixed(2)}/bu`,      cls: 'corn', sub: `from $${D.corn.price[1].toFixed(2)} (24/25)`,        dir: D.corn.price[2] >= D.corn.price[1] ? 'up' : 'down' },
+  { label: '🫘 Soybeans Avg Price', value: `$${D.soybeans.price[2].toFixed(2)}/bu`,  cls: 'soy',  sub: `from $${D.soybeans.price[1].toFixed(2)} (24/25)`,    dir: D.soybeans.price[2] >= D.soybeans.price[1] ? 'up' : 'down' },
+  { label: '🌾 Wheat Avg Price',    value: `$${D.wheat.price[2].toFixed(2)}/bu`,     cls: 'wheat',sub: `from $${D.wheat.price[1].toFixed(2)} (24/25)`,       dir: D.wheat.price[2] >= D.wheat.price[1] ? 'up' : 'down' },
+  { label: '🛢️ Soybean Oil Price', value: `${D.soybeans.oil.price[2].toFixed(1)}¢/lb`, cls: '', sub: `from ${D.soybeans.oil.price[1].toFixed(1)}¢ (24/25)`, dir: D.soybeans.oil.price[2] >= D.soybeans.oil.price[1] ? 'up' : 'down' },
 ];
 document.getElementById('kpiRow').innerHTML = kpis.map(k => `
   <div class="kpi">
@@ -423,11 +939,10 @@ document.getElementById('kpiRow').innerHTML = kpis.map(k => `
     <div class="sub ${k.dir === 'up' ? 'chg-up' : 'chg-down'}">${k.dir === 'up' ? '▲' : '▼'} ${k.sub}</div>
   </div>`).join('');
 
-// Detail tables
-function makeTable(id, title, rows, unitLabel) {
-  unitLabel = unitLabel || 'Mil Bu';
+// ========== GROUP 1 TABLES ==========
+function makeTable(id, title, rows) {
   const yrs = D.years;
-  let html = `<div class="card-header"><h2>${title}</h2><span class="unit">${unitLabel}</span></div><div class="card-body"><table>
+  let html = `<div class="card-header"><h2>${title}</h2><span class="unit">Mil Bu</span></div><div class="card-body"><table>
     <thead><tr><th>Item</th><th class="num">${yrs[0].split('/')[0]}</th><th class="num">${yrs[1].split(' ')[0]}</th><th class="num">25/26P</th><th class="num">Chg</th></tr></thead><tbody>`;
   rows.forEach(([label, vals, bold]) => {
     const d = vals[2] - vals[1];
@@ -441,30 +956,25 @@ function makeTable(id, title, rows, unitLabel) {
   document.getElementById(id).innerHTML = html;
 }
 
-const c = D.corn;
+const c = D.corn, s = D.soybeans, w = D.wheat;
 makeTable('cornTable', 'Corn Detail', [
   ['Production', c.production], ['Beg. Stocks', c.begStocks], ['Supply Total', c.supplyTotal],
   ['Feed & Residual', c.feedResidual], ['FSI (Ethanol etc)', c.fsi], ['Exports', c.exports],
   ['Use Total', c.useTotal], ['Ending Stocks', c.endStocks, true],
 ]);
-
-const s = D.soybeans;
 makeTable('soyTable', 'Soybeans Detail', [
   ['Production', s.production], ['Beg. Stocks', s.begStocks], ['Supply Total', s.supplyTotal],
   ['Crushings', s.crushings], ['Exports', s.exports],
   ['Use Total', s.useTotal], ['Ending Stocks', s.endStocks, true],
 ]);
-
-const w = D.wheat;
 makeTable('wheatTable', 'Wheat Detail', [
   ['Production', w.production], ['Beg. Stocks', w.begStocks], ['Supply Total', w.supplyTotal],
   ['Food', w.food], ['Feed & Residual', w.feedResidual], ['Exports', w.exports],
   ['Use Total', w.useTotal], ['Ending Stocks', w.endStocks, true],
 ]);
 
-// Soybean products
 document.getElementById('soyProductsCard').innerHTML = `
-  <div class="card-header"><h2>🫘 Soybean Products — Oil & Meal</h2></div>
+  <div class="card-header"><h2>🫘 Soybean Products — Oil &amp; Meal</h2></div>
   <div class="card-body"><table>
     <thead><tr><th>Soy Oil (Mil lbs)</th><th class="num">23/24</th><th class="num">24/25E</th><th class="num">25/26P</th>
     <th style="width:24px"></th><th>Soy Meal (K S.Tons)</th><th class="num">23/24</th><th class="num">24/25E</th><th class="num">25/26P</th></tr></thead>
@@ -481,8 +991,8 @@ document.getElementById('soyProductsCard').innerHTML = `
         <td></td><td class="bold">Avg Price</td><td class="num bold">$${s.meal.price[0]}</td><td class="num bold">$${s.meal.price[1]}</td><td class="num bold">$${s.meal.price[2]}</td></tr>
     </tbody></table></div>`;
 
-// ========== PRIMARY CHARTS ==========
-const colors = { corn: '#fbbf24', cornMid: '#f59e0b', cornDark: '#92400e', soy: '#34d399', soyMid: '#059669', soyDark: '#064e3b', wheat: '#f97316', wheatMid: '#ea580c', wheatDark: '#7c2d12', rice: '#22d3ee', riceMid: '#06b6d4', riceDark: '#0e7490', cotton: '#f472b6', cottonMid: '#ec4899', cottonDark: '#be185d', sorghum: '#a78bfa', sorghumMid: '#8b5cf6', sorghumDark: '#6d28d9', oats: '#fb923c', oatsMid: '#f97316', oatsDark: '#c2410c', grid: '#1e3348', text: '#94a3b8' };
+// ========== GROUP 1 CHARTS ==========
+const colors = { corn: '#fbbf24', cornMid: '#f59e0b', cornDark: '#92400e', soy: '#34d399', soyMid: '#059669', soyDark: '#064e3b', wheat: '#f97316', wheatMid: '#ea580c', wheatDark: '#7c2d12', grid: '#1e3348', text: '#94a3b8' };
 const baseOpts = () => ({
   responsive: true, maintainAspectRatio: false,
   plugins: { legend: { labels: { color: colors.text, font: { size: 11 }, boxWidth: 14 } } },
@@ -494,132 +1004,239 @@ function barChart(id, data, cols) {
     labels: D.years,
     datasets: [
       { label: 'Production', data: data.production, backgroundColor: cols[0] },
-      { label: 'Total Use', data: data.useTotal, backgroundColor: cols[1] },
+      { label: 'Total Use',  data: data.useTotal,   backgroundColor: cols[1] },
       { label: 'Ending Stocks', data: data.endStocks, backgroundColor: cols[2] },
     ]
   }, options: baseOpts() });
 }
 
-barChart('cornChart', c, [colors.corn, colors.cornMid, colors.cornDark]);
-barChart('soyChart', s, [colors.soy, colors.soyMid, colors.soyDark]);
+barChart('cornChart',  c, [colors.corn,  colors.cornMid,  colors.cornDark]);
+barChart('soyChart',   s, [colors.soy,   colors.soyMid,   colors.soyDark]);
 barChart('wheatChart', w, [colors.wheat, colors.wheatMid, colors.wheatDark]);
 
-// Price trend
 new Chart(document.getElementById('priceChart'), { type: 'line', data: {
   labels: D.years,
   datasets: [
-    { label: 'Corn', data: c.price, borderColor: colors.corn, backgroundColor: colors.corn+'33', tension: 0.3, fill: true, pointRadius: 5 },
-    { label: 'Soybeans', data: s.price, borderColor: colors.soy, backgroundColor: colors.soy+'33', tension: 0.3, fill: true, pointRadius: 5 },
-    { label: 'Wheat', data: w.price, borderColor: colors.wheat, backgroundColor: colors.wheat+'33', tension: 0.3, fill: true, pointRadius: 5 },
+    { label: 'Corn',     data: c.price, borderColor: colors.corn,  backgroundColor: colors.corn+'33',  tension: 0.3, fill: true, pointRadius: 5 },
+    { label: 'Soybeans', data: s.price, borderColor: colors.soy,   backgroundColor: colors.soy+'33',   tension: 0.3, fill: true, pointRadius: 5 },
+    { label: 'Wheat',    data: w.price, borderColor: colors.wheat, backgroundColor: colors.wheat+'33', tension: 0.3, fill: true, pointRadius: 5 },
   ]
 }, options: baseOpts() });
 
-// Stocks comparison — colored by commodity
 new Chart(document.getElementById('stocksChart'), { type: 'bar', data: {
-  labels: D.years,
-  datasets: [
-    { label: 'Corn', data: c.endStocks, backgroundColor: colors.corn },
-    { label: 'Soybeans', data: s.endStocks, backgroundColor: colors.soy },
-    { label: 'Wheat', data: w.endStocks, backgroundColor: colors.wheat },
-  ]
+  labels: ['Corn', 'Soybeans', 'Wheat'],
+  datasets: D.years.map((y,i) => ({ label: y, data: [c.endStocks[i], s.endStocks[i], w.endStocks[i]],
+    backgroundColor: ['#475569','#64748b','#94a3b8'][i] }))
 }, options: baseOpts() });
 
-// Wheat by class
 new Chart(document.getElementById('wheatClassChart'), { type: 'bar', data: {
   labels: w.byClass.labels,
   datasets: [
-    { label: 'Production', data: w.byClass.production, backgroundColor: colors.wheat },
-    { label: 'Exports', data: w.byClass.exports, backgroundColor: colors.wheatMid },
-    { label: 'Ending Stocks', data: w.byClass.endStocks, backgroundColor: colors.wheatDark },
+    { label: 'Production',    data: w.byClass.production, backgroundColor: colors.wheat },
+    { label: 'Exports',       data: w.byClass.exports,    backgroundColor: colors.wheatMid },
+    { label: 'Ending Stocks', data: w.byClass.endStocks,  backgroundColor: colors.wheatDark },
   ]
 }, options: { ...baseOpts(), indexAxis: 'y' } });
 
-// ==================== SECONDARY CROPS (Group 2) — Lazy Rendered ====================
-function renderSecondary() {
-  const ri = D.rice;
-  const co = D.cotton;
-  const sg = D.sorghum;
-  const oa = D.oats;
+// ========== GROUP 2 (lazy init) ==========
+let group2Init = false;
 
-  // KPIs
-  const kpis2 = [
-    { label: '🍚 Rice Avg Price', value: `$${ri.price[2].toFixed(2)}/cwt`, cls: 'rice',
-      sub: `from $${ri.price[1].toFixed(2)} (24/25)`, dir: ri.price[2] >= ri.price[1] ? 'up' : 'down' },
-    { label: '🏵️ Cotton Avg Price', value: `${co.price[2].toFixed(1)}¢/lb`, cls: 'cotton',
-      sub: `from ${co.price[1].toFixed(1)}¢ (24/25)`, dir: co.price[2] >= co.price[1] ? 'up' : 'down' },
-    { label: '🌿 Sorghum Avg Price', value: `$${sg.price[2].toFixed(2)}/bu`, cls: 'sorghum',
-      sub: `from $${sg.price[1].toFixed(2)} (24/25)`, dir: sg.price[2] >= sg.price[1] ? 'up' : 'down' },
-    { label: '🌾 Oats Avg Price', value: `$${oa.price[2].toFixed(2)}/bu`, cls: 'oats',
-      sub: `from $${oa.price[1].toFixed(2)} (24/25)`, dir: oa.price[2] >= oa.price[1] ? 'up' : 'down' },
-  ];
-  document.getElementById('kpiRow2').innerHTML = kpis2.map(k => `
-    <div class="kpi">
-      <div class="label">${k.label}</div>
-      <div class="value ${k.cls}">${k.value}</div>
-      <div class="sub ${k.dir === 'up' ? 'chg-up' : 'chg-down'}">${k.dir === 'up' ? '▲' : '▼'} ${k.sub}</div>
-    </div>`).join('');
+function makeG2Table(id, title, years, unit, rows) {
+  let html = `<div class="card-header"><h2>${title}</h2><span class="unit">${unit}</span></div><div class="card-body"><table>
+    <thead><tr><th>Item</th><th class="num">${years[0]}</th><th class="num">${years[1]}</th><th class="num">${years[2]}</th></tr></thead><tbody>`;
+  rows.forEach(([label, vals, bold]) => {
+    const b = bold ? '<strong>' : '', e = bold ? '</strong>' : '';
+    html += `<tr><td>${b}${label}${e}</td><td class="num">${b}${fmt(vals[0])}${e}</td><td class="num">${b}${fmt(vals[1])}${e}</td><td class="num">${b}${fmt(vals[2])}${e}</td></tr>`;
+  });
+  html += '</tbody></table></div>';
+  document.getElementById(id).innerHTML = html;
+}
 
-  // Tables
-  makeTable('riceTable', 'Rice Detail', [
-    ['Production', ri.production], ['Beg. Stocks', ri.begStocks], ['Supply Total', ri.supplyTotal],
-    ['Domestic Use', ri.domesticUse], ['Exports', ri.exports],
-    ['Use Total', ri.useTotal], ['Ending Stocks', ri.endStocks, true],
-  ], 'Mil Cwt');
+function kpiCards(id, items) {
+  document.getElementById(id).innerHTML = items.map(k =>
+    `<div class="kpi"><div class="label">${k.label}</div><div class="value ${k.cls}">${k.value}</div></div>`
+  ).join('');
+}
 
-  makeTable('cottonTable', 'Cotton Detail', [
-    ['Production', co.production], ['Beg. Stocks', co.begStocks], ['Supply Total', co.supplyTotal],
-    ['Domestic Use', co.domesticUse], ['Exports', co.exports],
-    ['Use Total', co.useTotal], ['Ending Stocks', co.endStocks, true],
-  ], 'Mil Bales');
-
-  makeTable('sorghumTable', 'Sorghum Detail', [
-    ['Production', sg.production], ['Beg. Stocks', sg.begStocks], ['Supply Total', sg.supplyTotal],
-    ['Feed & Residual', sg.feedResidual], ['FSI', sg.fsi], ['Exports', sg.exports],
-    ['Use Total', sg.useTotal], ['Ending Stocks', sg.endStocks, true],
-  ], 'Mil Bu');
-
-  makeTable('oatsTable', 'Oats Detail', [
-    ['Production', oa.production], ['Beg. Stocks', oa.begStocks], ['Supply Total', oa.supplyTotal],
-    ['Feed & Residual', oa.feedResidual], ['FSI', oa.fsi], ['Exports', oa.exports],
-    ['Use Total', oa.useTotal], ['Ending Stocks', oa.endStocks, true],
-  ], 'Mil Bu');
-
-  // Charts
-  barChart('riceChart', ri, [colors.rice, colors.riceMid, colors.riceDark]);
-  barChart('cottonChart', co, [colors.cotton, colors.cottonMid, colors.cottonDark]);
-  barChart('sorghumChart', sg, [colors.sorghum, colors.sorghumMid, colors.sorghumDark]);
-  barChart('oatsChart', oa, [colors.oats, colors.oatsMid, colors.oatsDark]);
-
-  // Price trend (secondary) — normalize for display since units differ
-  new Chart(document.getElementById('priceChart2'), { type: 'line', data: {
-    labels: D.years,
-    datasets: [
-      { label: 'Rice ($/cwt)', data: ri.price, borderColor: colors.rice, backgroundColor: colors.rice+'33', tension: 0.3, fill: false, pointRadius: 5, yAxisID: 'y' },
-      { label: 'Sorghum ($/bu)', data: sg.price, borderColor: colors.sorghum, backgroundColor: colors.sorghum+'33', tension: 0.3, fill: false, pointRadius: 5, yAxisID: 'y1' },
-      { label: 'Oats ($/bu)', data: oa.price, borderColor: colors.oats, backgroundColor: colors.oats+'33', tension: 0.3, fill: false, pointRadius: 5, yAxisID: 'y1' },
-      { label: 'Cotton (¢/lb)', data: co.price, borderColor: colors.cotton, backgroundColor: colors.cotton+'33', tension: 0.3, fill: false, pointRadius: 5, yAxisID: 'y2' },
-    ]
-  }, options: {
+function initGroup2Charts() {
+  const txtClr = '#94a3b8', gridClr = '#1e3348';
+  const g2Opts = () => ({
     responsive: true, maintainAspectRatio: false,
-    plugins: { legend: { labels: { color: colors.text, font: { size: 11 }, boxWidth: 14 } } },
-    scales: {
-      x: { ticks: { color: colors.text }, grid: { color: colors.grid } },
-      y: { type: 'linear', position: 'left', title: { display: true, text: '$/cwt (Rice)', color: colors.rice }, ticks: { color: colors.rice }, grid: { color: colors.grid } },
-      y1: { type: 'linear', position: 'right', title: { display: true, text: '$/bu', color: colors.sorghum }, ticks: { color: colors.sorghum }, grid: { drawOnChartArea: false } },
-      y2: { type: 'linear', position: 'right', title: { display: true, text: '¢/lb (Cotton)', color: colors.cotton }, ticks: { color: colors.cotton }, grid: { drawOnChartArea: false } },
-    }
-  }});
+    plugins: { legend: { labels: { color: txtClr, font: { size: 11 }, boxWidth: 14 } } },
+    scales: { x: { ticks: { color: txtClr }, grid: { color: gridClr } }, y: { ticks: { color: txtClr }, grid: { color: gridClr } } }
+  });
+  const g2OptsHoriz = () => ({
+    responsive: true, maintainAspectRatio: false,
+    indexAxis: 'y',
+    plugins: { legend: { display: false } },
+    scales: { x: { ticks: { color: txtClr }, grid: { color: gridClr }, beginAtZero: true }, y: { ticks: { color: txtClr }, grid: { color: gridClr } } }
+  });
 
-  // Ending stocks comparison (secondary) — colored by commodity
-  new Chart(document.getElementById('stocksChart2'), { type: 'bar', data: {
-    labels: D.years,
+  const R = D.rice, CT = D.cotton, SG = D.sorghum, OT = D.oats, CN = D.canola;
+
+  // Update G2 badge
+  document.getElementById('g2Badge').textContent = `${R.reportNote} · Run update_wasde.py to refresh`;
+
+  // ---- RICE ----
+  kpiCards('g2-rice-kpis', [
+    { label: 'U.S. Production',    value: R.production[2] + ' Mil Cwt', cls: 'rice-clr' },
+    { label: 'U.S. Ending Stocks', value: R.endStocks[2] + ' Mil Cwt',  cls: 'rice-clr' },
+    { label: 'U.S. Exports',       value: R.exports[2] + ' Mil Cwt',    cls: 'rice-clr' },
+    { label: 'Avg Farm Price',     value: '$' + R.price[2].toFixed(2) + '/cwt', cls: 'rice-clr' },
+  ]);
+  new Chart(document.getElementById('g2_riceUSBar'), { type: 'bar', data: {
+    labels: R.years,
     datasets: [
-      { label: 'Rice (Mil Cwt)', data: ri.endStocks, backgroundColor: colors.rice },
-      { label: 'Cotton (Mil Bales)', data: co.endStocks, backgroundColor: colors.cotton },
-      { label: 'Sorghum (Mil Bu)', data: sg.endStocks, backgroundColor: colors.sorghum },
-      { label: 'Oats (Mil Bu)', data: oa.endStocks, backgroundColor: colors.oats },
+      { label: 'Production',    data: R.production,  backgroundColor: '#22d3ee' },
+      { label: 'Domestic Use',  data: R.domesticUse, backgroundColor: '#06b6d4' },
+      { label: 'Exports',       data: R.exports,     backgroundColor: '#0891b2' },
+      { label: 'Ending Stocks', data: R.endStocks,   backgroundColor: '#0e7490' },
     ]
-  }, options: baseOpts() });
+  }, options: g2Opts() });
+  new Chart(document.getElementById('g2_ricePrice'), { type: 'line', data: {
+    labels: R.years,
+    datasets: [{ label: 'Avg Farm Price ($/cwt)', data: R.price, borderColor: '#22d3ee', backgroundColor: 'rgba(34,211,238,.15)', fill: true, tension: 0.3, pointRadius: 5 }]
+  }, options: g2Opts() });
+  new Chart(document.getElementById('g2_riceWorldBar'), { type: 'bar', data: {
+    labels: R.years,
+    datasets: [
+      { label: 'Production',    data: R.world.production,  backgroundColor: '#22d3ee' },
+      { label: 'Consumption',   data: R.world.consumption, backgroundColor: '#06b6d4' },
+      { label: 'Trade',         data: R.world.trade,       backgroundColor: '#0891b2' },
+      { label: 'Ending Stocks', data: R.world.endStocks,   backgroundColor: '#0e7490' },
+    ]
+  }, options: g2Opts() });
+  new Chart(document.getElementById('g2_riceExporters'), { type: 'bar', data: {
+    labels: ['India', 'Vietnam', 'Thailand', 'Pakistan', 'Burma', 'U.S.'],
+    datasets: [{ label: 'Exports (MMT)', data: [25.0, 7.9, 7.2, 5.1, 2.6, 2.76],
+      backgroundColor: ['#22d3ee','#06b6d4','#0891b2','#0e7490','#155e75','#f472b6'] }]
+  }, options: g2OptsHoriz() });
+  makeG2Table('g2-rice-table', 'U.S. Rice Detail', R.years, 'Mil Cwt', [
+    ['Production', R.production], ['Beginning Stocks', R.begStocks], ['Imports', R.imports],
+    ['Total Supply', R.supplyTotal], ['Domestic Use', R.domesticUse], ['Exports', R.exports],
+    ['Total Use', R.useTotal], ['Ending Stocks', R.endStocks, true], ['Avg Farm Price ($/cwt)', R.price],
+  ]);
+
+  // ---- COTTON ----
+  kpiCards('g2-cotton-kpis', [
+    { label: 'U.S. Production',    value: CT.production[2] + ' Mil Bales', cls: 'cotton-clr' },
+    { label: 'U.S. Ending Stocks', value: CT.endStocks[2] + ' Mil Bales',  cls: 'cotton-clr' },
+    { label: 'U.S. Exports',       value: CT.exports[2] + ' Mil Bales',    cls: 'cotton-clr' },
+    { label: 'Avg Farm Price',     value: CT.price[2].toFixed(1) + '¢/lb', cls: 'cotton-clr' },
+  ]);
+  new Chart(document.getElementById('g2_cottonUSBar'), { type: 'bar', data: {
+    labels: CT.years,
+    datasets: [
+      { label: 'Production',    data: CT.production,  backgroundColor: '#f472b6' },
+      { label: 'Domestic Use',  data: CT.domesticUse, backgroundColor: '#ec4899' },
+      { label: 'Exports',       data: CT.exports,     backgroundColor: '#db2777' },
+      { label: 'Ending Stocks', data: CT.endStocks,   backgroundColor: '#be185d' },
+    ]
+  }, options: g2Opts() });
+  new Chart(document.getElementById('g2_cottonPrice'), { type: 'line', data: {
+    labels: CT.years,
+    datasets: [{ label: 'Upland Farm Price (¢/lb)', data: CT.price, borderColor: '#f472b6', backgroundColor: 'rgba(244,114,182,.15)', fill: true, tension: 0.3, pointRadius: 5 }]
+  }, options: g2Opts() });
+  new Chart(document.getElementById('g2_cottonWorldBar'), { type: 'bar', data: {
+    labels: CT.years,
+    datasets: [
+      { label: 'Production',    data: CT.world.production,  backgroundColor: '#f472b6' },
+      { label: 'Consumption',   data: CT.world.consumption, backgroundColor: '#ec4899' },
+      { label: 'Trade',         data: CT.world.trade,       backgroundColor: '#db2777' },
+      { label: 'Ending Stocks', data: CT.world.endStocks,   backgroundColor: '#be185d' },
+    ]
+  }, options: g2Opts() });
+  new Chart(document.getElementById('g2_cottonProducers'), { type: 'bar', data: {
+    labels: ['China', 'India', 'Brazil', 'U.S.', 'Central Asia', 'Australia'],
+    datasets: [{ label: 'Production (Mil Bales)', data: [35.0, 23.5, 18.75, 13.92, 4.81, 4.5],
+      backgroundColor: ['#f472b6','#ec4899','#db2777','#22d3ee','#be185d','#9d174d'] }]
+  }, options: g2OptsHoriz() });
+  makeG2Table('g2-cotton-table', 'U.S. Cotton Detail', CT.years, 'Mil 480-lb Bales', [
+    ['Production', CT.production], ['Beginning Stocks', CT.begStocks], ['Imports', CT.imports],
+    ['Total Supply', CT.supplyTotal], ['Domestic Use', CT.domesticUse], ['Exports', CT.exports],
+    ['Total Use', CT.useTotal], ['Ending Stocks', CT.endStocks, true], ['Avg Farm Price (¢/lb)', CT.price],
+  ]);
+
+  // ---- SORGHUM ----
+  kpiCards('g2-sorghum-kpis', [
+    { label: 'U.S. Production',    value: SG.production[2] + ' Mil Bu', cls: 'sorghum-clr' },
+    { label: 'U.S. Exports',       value: SG.exports[2] + ' Mil Bu',    cls: 'sorghum-clr' },
+    { label: 'Ending Stocks',      value: SG.endStocks[2] + ' Mil Bu',  cls: 'sorghum-clr' },
+    { label: 'Avg Farm Price',     value: '$' + SG.price[2].toFixed(2) + '/bu', cls: 'sorghum-clr' },
+  ]);
+  new Chart(document.getElementById('g2_sorghumBar'), { type: 'bar', data: {
+    labels: SG.years,
+    datasets: [
+      { label: 'Production',      data: SG.production,   backgroundColor: '#a78bfa' },
+      { label: 'Feed & Residual', data: SG.feedResidual, backgroundColor: '#8b5cf6' },
+      { label: 'Exports',         data: SG.exports,      backgroundColor: '#7c3aed' },
+      { label: 'Ending Stocks',   data: SG.endStocks,    backgroundColor: '#6d28d9' },
+    ]
+  }, options: g2Opts() });
+  new Chart(document.getElementById('g2_sorghumPrice'), { type: 'line', data: {
+    labels: SG.years,
+    datasets: [{ label: 'Avg Farm Price ($/bu)', data: SG.price, borderColor: '#a78bfa', backgroundColor: 'rgba(167,139,250,.15)', fill: true, tension: 0.3, pointRadius: 5 }]
+  }, options: g2Opts() });
+  makeG2Table('g2-sorghum-table', 'U.S. Sorghum Detail', SG.years, 'Mil Bu', [
+    ['Production', SG.production], ['Beginning Stocks', SG.begStocks], ['Imports', SG.imports],
+    ['Total Supply', SG.supplyTotal], ['Feed & Residual', SG.feedResidual], ['Exports', SG.exports],
+    ['Total Use', SG.useTotal], ['Ending Stocks', SG.endStocks, true], ['Avg Farm Price ($/bu)', SG.price],
+  ]);
+
+  // ---- OATS ----
+  kpiCards('g2-oats-kpis', [
+    { label: 'U.S. Production',    value: OT.production[2] + ' Mil Bu', cls: 'oats-clr' },
+    { label: 'U.S. Imports',       value: OT.imports[2] + ' Mil Bu',    cls: 'oats-clr' },
+    { label: 'Ending Stocks',      value: OT.endStocks[2] + ' Mil Bu',  cls: 'oats-clr' },
+    { label: 'Avg Farm Price',     value: '$' + OT.price[2].toFixed(2) + '/bu', cls: 'oats-clr' },
+  ]);
+  new Chart(document.getElementById('g2_oatsBar'), { type: 'bar', data: {
+    labels: OT.years,
+    datasets: [
+      { label: 'Production',       data: OT.production,      backgroundColor: '#fbbf24' },
+      { label: 'Food & Industrial',data: OT.foodIndustrial,  backgroundColor: '#f59e0b' },
+      { label: 'Feed & Residual',  data: OT.feedResidual,    backgroundColor: '#d97706' },
+      { label: 'Ending Stocks',    data: OT.endStocks,       backgroundColor: '#b45309' },
+    ]
+  }, options: g2Opts() });
+  new Chart(document.getElementById('g2_oatsPrice'), { type: 'line', data: {
+    labels: OT.years,
+    datasets: [{ label: 'Avg Farm Price ($/bu)', data: OT.price, borderColor: '#fbbf24', backgroundColor: 'rgba(251,191,36,.15)', fill: true, tension: 0.3, pointRadius: 5 }]
+  }, options: g2Opts() });
+  makeG2Table('g2-oats-table', 'U.S. Oats Detail', OT.years, 'Mil Bu', [
+    ['Production', OT.production], ['Beginning Stocks', OT.begStocks], ['Imports', OT.imports],
+    ['Total Supply', OT.supplyTotal], ['Food & Industrial', OT.foodIndustrial],
+    ['Feed & Residual', OT.feedResidual], ['Exports', OT.exports],
+    ['Total Use', OT.useTotal], ['Ending Stocks', OT.endStocks, true], ['Avg Farm Price ($/bu)', OT.price],
+  ]);
+
+  // ---- CANOLA ----
+  kpiCards('g2-canola-kpis', [
+    { label: 'World Production',    value: CN.production[2] + ' MMT', cls: 'canola-clr' },
+    { label: 'World Crushings',     value: CN.crushings[2] + ' MMT',  cls: 'canola-clr' },
+    { label: 'World Ending Stocks', value: CN.endStocks[2] + ' MMT',  cls: 'canola-clr' },
+  ]);
+  new Chart(document.getElementById('g2_canolaBar'), { type: 'bar', data: {
+    labels: CN.years,
+    datasets: [
+      { label: 'Production',    data: CN.production, backgroundColor: '#4ade80' },
+      { label: 'Crushings',     data: CN.crushings,  backgroundColor: '#22c55e' },
+      { label: 'Exports',       data: CN.exports,    backgroundColor: '#16a34a' },
+      { label: 'Ending Stocks', data: CN.endStocks,  backgroundColor: '#15803d' },
+    ]
+  }, options: g2Opts() });
+  new Chart(document.getElementById('g2_canolaLine'), { type: 'line', data: {
+    labels: CN.years,
+    datasets: [
+      { label: 'Production', data: CN.production, borderColor: '#4ade80', backgroundColor: 'rgba(74,222,128,.15)', fill: true, tension: 0.3, pointRadius: 5 },
+      { label: 'Crushings',  data: CN.crushings,  borderColor: '#22c55e', backgroundColor: 'transparent', tension: 0.3, pointRadius: 4, borderDash: [5,5] },
+    ]
+  }, options: g2Opts() });
+  makeG2Table('g2-canola-table', 'World Canola/Rapeseed Detail', CN.years, 'MMT', [
+    ['Production', CN.production], ['Beginning Stocks', CN.begStocks],
+    ['Crushings', CN.crushings], ['Exports', CN.exports],
+    ['Total Use', CN.useTotal], ['Ending Stocks', CN.endStocks, true],
+  ]);
 }
 </script>
 </body>

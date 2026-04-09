@@ -250,24 +250,18 @@ def extract_data(xls_path, year, month):
     }
 
     # -----------------------------------------------------------------------
-    # SORGHUM (Page 13)
+    # SORGHUM (Page 13 — shares sheet with Barley & Oats)
     # -----------------------------------------------------------------------
     sorghum = parse_simple_crop(read_sheet('Page 13'), 'SORGHUM')
 
     # -----------------------------------------------------------------------
-    # OATS (Page 14 — may be combined Barley & Oats)
+    # OATS (Page 13 — same sheet as Sorghum & Barley)
     # -----------------------------------------------------------------------
-    oats_rows = read_sheet('Page 14') or read_sheet('Page 14a') or []
+    oats_rows = read_sheet('Page 13') or []
     oats_start = find_section(oats_rows, 'OATS') if oats_rows else 0
-    oats_end   = len(oats_rows)
-    for i in range(oats_start + 1, len(oats_rows)):
-        cell = str(oats_rows[i][0]).strip().upper()
-        if cell and cell != cell.lower() and len(cell) > 3 and cell[0].isalpha():
-            oats_end = i
-            break
 
     def get_oats(label):
-        return get_col_row(oats_rows, label, oats_start, oats_end)
+        return get_col_row(oats_rows, label, oats_start)
 
     oats = {
         'price':          get_oats('Avg. Farm Price'),
@@ -283,12 +277,10 @@ def extract_data(xls_path, year, month):
     }
 
     # -----------------------------------------------------------------------
-    # RICE — U.S. (Page 18)
+    # RICE — U.S. (Page 14)
     # -----------------------------------------------------------------------
-    rice_rows = read_sheet('Page 18')
-    rice_start = find_section(rice_rows, 'ALL RICE') if rice_rows else 0
-    if rice_start == 0:
-        rice_start = find_section(rice_rows, 'RICE') if rice_rows else 0
+    rice_rows = read_sheet('Page 14')
+    rice_start = find_section(rice_rows, 'TOTAL RICE') if rice_rows else 0
 
     def get_rice(label):
         return get_col_row(rice_rows, label, rice_start)
@@ -299,14 +291,14 @@ def extract_data(xls_path, year, month):
         'begStocks':   get_rice('Beginning Stocks'),
         'imports':     get_rice('Imports'),
         'supplyTotal': get_rice('Supply, Total'),
-        'domesticUse': get_rice('Domestic'),
-        'exports':     get_rice('Exports'),
+        'domesticUse': get_rice('Domestic & Residual'),
+        'exports':     get_rice('Exports, Total'),
         'useTotal':    get_rice('Use, Total'),
         'endStocks':   get_rice('Ending Stocks'),
     }
 
-    # World Rice (Page 19)
-    world_rice_rows = read_sheet('Page 19') or []
+    # World Rice (Page 24)
+    world_rice_rows = read_sheet('Page 24') or []
     w_rice_start = find_section(world_rice_rows, 'WORLD') if world_rice_rows else 0
 
     world_rice = {
@@ -317,12 +309,10 @@ def extract_data(xls_path, year, month):
     }
 
     # -----------------------------------------------------------------------
-    # COTTON — U.S. (Page 20)
+    # COTTON — U.S. (Page 17)
     # -----------------------------------------------------------------------
-    cotton_rows = read_sheet('Page 20')
-    cotton_start = find_section(cotton_rows, 'UPLAND') if cotton_rows else 0
-    if cotton_start == 0:
-        cotton_start = find_section(cotton_rows, 'COTTON') if cotton_rows else 0
+    cotton_rows = read_sheet('Page 17')
+    cotton_start = 0  # no crop header on this page; data starts from top
 
     def get_cotton(label):
         return get_col_row(cotton_rows, label, cotton_start)
@@ -333,14 +323,14 @@ def extract_data(xls_path, year, month):
         'begStocks':   get_cotton('Beginning Stocks'),
         'imports':     get_cotton('Imports'),
         'supplyTotal': get_cotton('Supply, Total'),
-        'domesticUse': get_cotton('Mill Use'),
-        'exports':     get_cotton('Exports'),
+        'domesticUse': get_cotton('Domestic Use'),
+        'exports':     get_cotton('Exports, Total'),
         'useTotal':    get_cotton('Use, Total'),
         'endStocks':   get_cotton('Ending Stocks'),
     }
 
-    # World Cotton (Page 21)
-    world_cotton_rows = read_sheet('Page 21') or []
+    # World Cotton (Page 26)
+    world_cotton_rows = read_sheet('Page 26') or []
     w_cotton_start = find_section(world_cotton_rows, 'WORLD') if world_cotton_rows else 0
 
     world_cotton = {
