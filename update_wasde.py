@@ -351,31 +351,6 @@ def extract_data(xls_path, year, month):
     }
 
     # -----------------------------------------------------------------------
-    # CANOLA / RAPESEED (world oilseeds — try several page names)
-    # -----------------------------------------------------------------------
-    canola = None
-    for page_name in ['Page 28', 'Page 27', 'Page 26', 'Page 29', 'Page 30']:
-        canola_rows = try_read_sheet(wb, page_name)
-        if not canola_rows:
-            continue
-        rap_start = find_section(canola_rows, 'RAPESEED')
-        if rap_start == 0:
-            rap_start = find_section(canola_rows, 'CANOLA')
-        if rap_start > 0:
-            canola = {
-                'production': get_col_row(canola_rows, 'Production',     rap_start),
-                'begStocks':  get_col_row(canola_rows, 'Beginning Stocks', rap_start),
-                'crushings':  get_col_row(canola_rows, 'Crush',           rap_start),
-                'exports':    get_col_row(canola_rows, 'Exports',         rap_start),
-                'useTotal':   get_col_row(canola_rows, 'Use, Total',      rap_start),
-                'endStocks':  get_col_row(canola_rows, 'Ending Stocks',   rap_start),
-            }
-            print(f"  Canola/Rapeseed found on {page_name}")
-            break
-    if canola is None:
-        print("  WARNING: Rapeseed/Canola sheet not found — existing dashboard data preserved")
-
-    # -----------------------------------------------------------------------
     # Convert 4-element [23/24, 24/25, prev_mo, cur_mo] -> 3-element [23/24, 24/25, cur_mo]
     # -----------------------------------------------------------------------
     def to3(arr):
@@ -437,27 +412,11 @@ def extract_data(xls_path, year, month):
     result['soybeans']['endStocksPrev'] = soy_es_prev
     result['wheat']['endStocksPrev']    = wheat_es_prev
 
-    if canola is not None:
-        result['canola'] = g2_wrap(canola, g2_year_labels, g2_note, 'MMT')
-    # If canola is None, update_html will preserve existing canola data from the file
-
     return result
 
 
 def update_html(data):
     html = TEMPLATE_PATH.read_text(encoding='utf-8')
-
-    # If canola wasn't found, preserve existing block from the current HTML
-    if 'canola' not in data:
-        canola_match = re.search(
-            r'"canola"\s*:\s*(\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\})',
-            html, flags=re.DOTALL
-        )
-        if canola_match:
-            try:
-                data['canola'] = json.loads(canola_match.group(1))
-            except Exception:
-                pass
 
     data_json = json.dumps(data, indent=2)
 
@@ -510,11 +469,6 @@ def main():
     print(f"Cotton   endStocks:   {data['cotton']['endStocks']}")
     print(f"Sorghum  exports:     {data['sorghum']['exports']}")
     print(f"Oats     production:  {data['oats']['production']}")
-    if 'canola' in data:
-        print(f"Canola   production:  {data['canola']['production']}")
-    else:
-        print("  ⚠️  Canola not found — existing data preserved")
-
     wbc = data['wheat']['byClass']
     print(f"Wheat by class production: {wbc['production']}")
 
