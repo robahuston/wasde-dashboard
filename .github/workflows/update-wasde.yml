@@ -1,7 +1,7 @@
 name: Update WASDE Dashboard
 on:
   schedule:
-    - cron: '0,30 16-17 9-13 * *'
+    - cron: '*/5 16-17 9-13 * *'
   workflow_dispatch:
     inputs:
       year:
